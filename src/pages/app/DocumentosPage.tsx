@@ -8,6 +8,7 @@ import type { Document } from '../../types/entities'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
 import { LoadingState } from '../../components/common/LoadingState'
+import { ErrorState } from '../../components/common/ErrorState'
 import { EmptyState } from '../../components/ui/EmptyState'
 import { ConfirmDialog } from '../../components/common/ConfirmDialog'
 import { formatDateBR } from '../../lib/helpers'
@@ -21,13 +22,20 @@ export function DocumentosPage() {
   const orgId = session!.organization.id
   const [docs, setDocs] = useState<Document[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const load = async () => {
     setLoading(true)
-    setDocs(await listDocuments(orgId))
-    setLoading(false)
+    setError(null)
+    try {
+      setDocs(await listDocuments(orgId))
+    } catch {
+      setError('Não foi possível carregar os documentos. Tente novamente.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => { load() }, [orgId])
@@ -65,6 +73,7 @@ export function DocumentosPage() {
   const formatSize = (b: number) => b < 1024 * 1024 ? `${(b / 1024).toFixed(1)} KB` : `${(b / (1024 * 1024)).toFixed(1)} MB`
 
   if (loading) return <LoadingState />
+  if (error) return <ErrorState message={error} onRetry={load} />
 
   return (
     <div className="space-y-6">

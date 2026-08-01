@@ -29,6 +29,21 @@ const sizes: Record<Size, string> = {
   lg: 'px-7 py-3 text-base',
 }
 
+export function buttonStyles(
+  variant: Variant = 'primary',
+  size: Size = 'md',
+  fullWidth?: boolean,
+  className?: string,
+) {
+  return cn(
+    'inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed',
+    variants[variant],
+    sizes[size],
+    fullWidth && 'w-full',
+    className,
+  )
+}
+
 export function Button({
   variant = 'primary',
   size = 'md',
@@ -38,16 +53,7 @@ export function Button({
   ...props
 }: ButtonProps) {
   return (
-    <button
-      className={cn(
-        'inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed',
-        variants[variant],
-        sizes[size],
-        fullWidth && 'w-full',
-        className,
-      )}
-      {...props}
-    >
+    <button className={buttonStyles(variant, size, fullWidth, className)} {...props}>
       {children}
     </button>
   )

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { FileText, Lightbulb, ScrollText, Download, Sparkles } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
+import { useToast } from '../../context/ToastContext'
 import { analyzeLegalText, type AILegalResult } from '../../services/aiLegalService'
 import { Button } from '../../components/ui/Button'
 import { AIDisclaimer } from '../../components/common/AIDisclaimer'
@@ -23,6 +24,7 @@ const SECONDARY_ACTIONS: { type: AnalysisType; label: string; icon: typeof FileT
 
 export function IAPage() {
   const { session, hasPermission } = useAuth()
+  const { error: toastError } = useToast()
   const [texto, setTexto] = useState('')
   const [result, setResult] = useState<AILegalResult | null>(null)
   const [loading, setLoading] = useState<AnalysisType | null>(null)
@@ -38,6 +40,8 @@ export function IAPage() {
     try {
       const r = await analyzeLegalText({ text: texto, type })
       setResult(r)
+    } catch {
+      toastError('Não foi possível concluir a análise. Tente novamente.')
     } finally {
       setLoading(null)
     }

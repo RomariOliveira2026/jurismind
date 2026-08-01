@@ -1,7 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { ThemeProvider } from './context/ThemeContext'
-import { AuthProvider } from './context/AuthContext'
+import { AuthProvider, useAuth } from './context/AuthContext'
 import { FocusModeProvider } from './context/FocusModeContext'
 import { QueryProvider } from './context/QueryProvider'
 import { ToastProvider } from './context/ToastContext'
@@ -42,6 +42,12 @@ const AssistantPlaceholderPage = lazy(() => import('./pages/app/AssistantPlaceho
 
 function PageLoader() {
   return <LoadingState message="Carregando..." />
+}
+
+function NotFoundRedirect() {
+  const { session, loading } = useAuth()
+  if (loading) return <PageLoader />
+  return <Navigate to={session ? '/app/dashboard' : '/'} replace />
 }
 
 export default function App() {
@@ -100,7 +106,7 @@ export default function App() {
                       <Route path="configuracoes" element={<ConfiguracoesPage />} />
                     </Route>
 
-                    <Route path="*" element={<Navigate to="/" replace />} />
+                    <Route path="*" element={<NotFoundRedirect />} />
                   </Routes>
                 </Suspense>
               </BrowserRouter>

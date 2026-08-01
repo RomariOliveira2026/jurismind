@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { ArrowLeft, Construction } from 'lucide-react'
 import { AIWarningBanner } from '../../components/ai/AIWarningBanner'
 import { Card } from '../../components/ui/Card'
-import { Button } from '../../components/ui/Button'
+import { buttonStyles } from '../../components/ui/Button'
 
 export function AssistantPlaceholderPage({ name, description }: { name: string; description: string }) {
   return (
@@ -16,8 +16,8 @@ export function AssistantPlaceholderPage({ name, description }: { name: string; 
         <h2 className="text-xl font-bold text-navy dark:text-ice">{name}</h2>
         <p className="text-sm text-text-muted mt-2">{description}</p>
         <p className="text-xs text-amber-600 mt-4">Arquitetura preparada — interface em evolução nesta sprint.</p>
-        <Link to="/app/assistentes/publicacoes" className="inline-block mt-6">
-          <Button variant="gold" size="sm">Usar Assistente de Publicações</Button>
+        <Link to="/app/assistentes/publicacoes" className={buttonStyles('gold', 'sm', false, 'mt-6 inline-flex')}>
+          Usar Assistente de Publicações
         </Link>
       </Card>
     </div>

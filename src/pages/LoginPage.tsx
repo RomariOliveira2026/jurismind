@@ -1,5 +1,5 @@
-import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { useState } from 'react'
+import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import { Logo } from '../components/Logo'
 import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
@@ -9,6 +9,7 @@ export function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const { signIn, signInDemo } = useAuth()
+  const [searchParams] = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -32,6 +33,17 @@ export function LoginPage() {
     setLoading(false)
     navigate('/app/dashboard', { replace: true })
   }
+
+  useEffect(() => {
+    if (searchParams.get('demo') !== '1') return
+    let cancelled = false
+    ;(async () => {
+      setLoading(true)
+      await signInDemo()
+      if (!cancelled) navigate('/app/dashboard', { replace: true })
+    })()
+    return () => { cancelled = true }
+  }, [searchParams, navigate, signInDemo])
 
   return (
     <div className="flex min-h-screen">
@@ -62,8 +74,8 @@ export function LoginPage() {
             <Input label="E-mail" type="email" placeholder="seu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
             <Input label="Senha" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required />
             <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 text-sm text-text">
-                <input type="checkbox" className="rounded border-slate-300" />
+              <label className="flex items-center gap-2 text-sm text-text-muted dark:text-slate-400">
+                <input type="checkbox" className="rounded border-slate-300 dark:border-slate-600 dark:bg-navy-light dark:checked:bg-gold dark:checked:border-gold" />
                 Lembrar-me
               </label>
               <Link to="/recuperar-senha" className="text-sm text-gold hover:underline">Esqueci a senha</Link>

@@ -11,6 +11,7 @@ import { Input, Textarea, Select } from '../../components/ui/Input'
 import { Badge } from '../../components/ui/Badge'
 import { EmptyState } from '../../components/ui/EmptyState'
 import { LoadingState } from '../../components/common/LoadingState'
+import { ErrorState } from '../../components/common/ErrorState'
 import { ConfirmDialog } from '../../components/common/ConfirmDialog'
 import { DEADLINE_STATUS_LABELS, DEADLINE_PRIORITY_LABELS, deadlineStatusVariant, priorityVariant } from '../../lib/labels'
 import { formatDateBR, daysUntil, todayISO, addDays, AI_DISCLAIMER } from '../../lib/helpers'
@@ -22,6 +23,7 @@ export function PrazosPage() {
   const [deadlines, setDeadlines] = useState<Deadline[]>([])
   const [cases, setCases] = useState<{ id: string; label: string }[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [view, setView] = useState<'lista' | 'quadro'>('lista')
   const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || '')
   const [modalOpen, setModalOpen] = useState(false)
@@ -31,20 +33,26 @@ export function PrazosPage() {
 
   const load = async () => {
     setLoading(true)
-    const periodo = searchParams.get('periodo')
-    let from: string | undefined
-    let to: string | undefined
-    const today = todayISO()
-    if (periodo === 'hoje') { from = today; to = today }
-    if (periodo === '7dias') { from = today; to = addDays(today, 7) }
+    setError(null)
+    try {
+      const periodo = searchParams.get('periodo')
+      let from: string | undefined
+      let to: string | undefined
+      const today = todayISO()
+      if (periodo === 'hoje') { from = today; to = today }
+      if (periodo === '7dias') { from = today; to = addDays(today, 7) }
 
-    const [dl, cs] = await Promise.all([
-      listDeadlines(orgId, { status: statusFilter || undefined, from, to }),
-      listCases(orgId),
-    ])
-    setDeadlines(dl)
-    setCases(cs.map((c) => ({ id: c.id, label: `${c.caseNumber} — ${c.clientName}` })))
-    setLoading(false)
+      const [dl, cs] = await Promise.all([
+        listDeadlines(orgId, { status: statusFilter || undefined, from, to }),
+        listCases(orgId),
+      ])
+      setDeadlines(dl)
+      setCases(cs.map((c) => ({ id: c.id, label: `${c.caseNumber} — ${c.clientName}` })))
+    } catch {
+      setError('Não foi possível carregar os prazos. Tente novamente.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => { load() }, [orgId, statusFilter, searchParams])
@@ -57,6 +65,7 @@ export function PrazosPage() {
   }
 
   if (loading) return <LoadingState />
+  if (error) return <ErrorState message={error} onRetry={load} />
 
   const grouped = deadlines.reduce<Record<string, Deadline[]>>((acc, d) => {
     const key = d.deadlineDate

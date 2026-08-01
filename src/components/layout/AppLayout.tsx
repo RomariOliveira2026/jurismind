@@ -10,19 +10,22 @@ import { useFocusMode } from '../../context/FocusModeContext'
 import { Button } from '../ui/Button'
 
 const pageTitles: Record<string, string> = {
-  '/app/intelligence': 'Intelligence Center',
-  '/app/intelligence/timeline': 'Timeline Inteligente',
-  '/app/intelligence/configuracoes': 'Intelligence Settings',
+  '/app/intelligence': 'Centro de Inteligência',
+  '/app/intelligence/timeline': 'Linha do tempo inteligente',
+  '/app/intelligence/configuracoes': 'Configurações de inteligência',
   '/app/dashboard': 'Dashboard',
   '/app/clientes': 'Clientes',
   '/app/processos': 'Processos',
   '/app/prazos': 'Prazos',
   '/app/publicacoes': 'Publicações',
   '/app/agenda': 'Agenda',
+  '/app/assistentes': 'Assistentes Jurídicos',
   '/app/ia': 'IA Jurídica',
   '/app/documentos': 'Documentos',
   '/app/relatorios': 'Relatórios',
   '/app/configuracoes': 'Configurações',
+  '/app/diagnostico-ia': 'Diagnóstico de IA',
+  '/app/configuracoes/ia': 'Governança da IA',
 }
 
 function resolveTitle(pathname: string): string {

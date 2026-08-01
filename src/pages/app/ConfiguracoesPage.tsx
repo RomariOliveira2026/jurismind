@@ -125,8 +125,11 @@ export function ConfiguracoesPage() {
       {tab === 'seguranca' && (
         <Card>
           <CardHeader><div className="flex items-center gap-2"><Shield className="h-5 w-5 text-gold" /><CardTitle>Segurança</CardTitle></div></CardHeader>
-          <Link to="/app/configuracoes/ia" className="inline-flex items-center gap-2 text-sm text-gold hover:underline mb-4">
+          <Link to="/app/configuracoes/ia" className="inline-flex items-center gap-2 text-sm text-gold hover:underline mb-2">
             Governança da IA →
+          </Link>
+          <Link to="/app/diagnostico-ia" className="inline-flex items-center gap-2 text-sm text-gold hover:underline mb-4">
+            Diagnóstico de IA →
           </Link>
           {!isDemo ? (
             <form

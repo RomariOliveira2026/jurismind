@@ -111,7 +111,7 @@ export function IAResultCard({ result, isDemo, copied, onCopy, authorName, creat
             <div className="flex gap-2 shrink-0">
               <Button variant="outline" size="sm" onClick={onCopy} className="h-8 gap-1.5">
                 <Copy className="h-3.5 w-3.5" aria-hidden />
-                {copied ? 'Copiado!' : 'Exportar'}
+                {copied ? 'Copiado!' : 'Copiar'}
               </Button>
               <Button variant="ghost" size="sm" className="h-8 gap-1.5">
                 <Save className="h-3.5 w-3.5" aria-hidden />

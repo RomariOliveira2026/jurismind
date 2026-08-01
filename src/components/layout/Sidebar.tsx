@@ -11,20 +11,21 @@ import {
   FolderOpen,
   X,
   Sparkles,
+  Bot,
 } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 import { cn } from '../../lib/utils'
 import { Logo } from '../Logo'
 
 const menuItems = [
-  { to: '/app/intelligence', icon: Sparkles, label: 'Intelligence Center' },
+  { to: '/app/intelligence', icon: Sparkles, label: 'Centro de Inteligência' },
   { to: '/app/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/app/clientes', icon: Users, label: 'Clientes' },
   { to: '/app/processos', icon: Briefcase, label: 'Processos' },
   { to: '/app/prazos', icon: Clock, label: 'Prazos' },
   { to: '/app/publicacoes', icon: Newspaper, label: 'Publicações' },
   { to: '/app/agenda', icon: Calendar, label: 'Agenda' },
-  { to: '/app/assistentes', icon: Sparkles, label: 'Assistentes Jurídicos' },
+  { to: '/app/assistentes', icon: Bot, label: 'Assistentes Jurídicos' },
   { to: '/app/ia', icon: Brain, label: 'IA Jurídica' },
   { to: '/app/documentos', icon: FolderOpen, label: 'Documentos' },
   { to: '/app/relatorios', icon: BarChart3, label: 'Relatórios' },

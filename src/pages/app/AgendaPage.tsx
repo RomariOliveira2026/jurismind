@@ -7,6 +7,7 @@ import type { AgendaEvent } from '../../types/entities'
 import { Card } from '../../components/ui/Card'
 import { Badge } from '../../components/ui/Badge'
 import { LoadingState } from '../../components/common/LoadingState'
+import { ErrorState } from '../../components/common/ErrorState'
 import { EmptyState } from '../../components/ui/EmptyState'
 import { formatDateBR } from '../../lib/helpers'
 import { DEADLINE_PRIORITY_LABELS, priorityVariant } from '../../lib/labels'
@@ -16,21 +17,27 @@ export function AgendaPage() {
   const orgId = session!.organization.id
   const [events, setEvents] = useState<AgendaEvent[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [view, setView] = useState<'lista' | 'semana'>('lista')
   const [clientFilter, setClientFilter] = useState('')
   const [typeFilter, setTypeFilter] = useState('')
   const [clients, setClients] = useState<{ id: string; name: string }[]>([])
 
-  useEffect(() => {
-    const load = async () => {
-      setLoading(true)
+  const load = async () => {
+    setLoading(true)
+    setError(null)
+    try {
       const [ev, cl] = await Promise.all([getAgendaEvents(orgId), listClients(orgId)])
       setEvents(ev)
       setClients(cl.map((c) => ({ id: c.id, name: c.name })))
+    } catch {
+      setError('Não foi possível carregar a agenda. Tente novamente.')
+    } finally {
       setLoading(false)
     }
-    load()
-  }, [orgId])
+  }
+
+  useEffect(() => { load() }, [orgId])
 
   const filtered = useMemo(() => {
     return events.filter((e) => {
@@ -64,6 +71,7 @@ export function AgendaPage() {
   }
 
   if (loading) return <LoadingState />
+  if (error) return <ErrorState message={error} onRetry={load} />
 
   return (
     <div className="space-y-6">

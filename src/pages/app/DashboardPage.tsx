@@ -5,7 +5,7 @@ import { useDashboard } from '../../hooks/useDashboard'
 import { StatCard } from '../../components/ui/StatCard'
 import { Card, CardHeader, CardTitle } from '../../components/ui/Card'
 import { Badge } from '../../components/ui/Badge'
-import { Button } from '../../components/ui/Button'
+import { buttonStyles } from '../../components/ui/Button'
 import { LoadingState } from '../../components/common/LoadingState'
 import { ErrorState } from '../../components/common/ErrorState'
 import { DoughnutChart } from '../../components/dashboard/DoughnutChart'
@@ -94,20 +94,23 @@ export function DashboardPage() {
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <Link to="/app/assistentes/publicacoes" className="inline-flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/60 focus-visible:ring-offset-2 rounded-lg">
-          <Button variant="gold" size="sm" className="h-9 px-3.5 gap-2 transition-opacity duration-[180ms] hover:opacity-95 focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2">
-            <Brain className="h-4 w-4 shrink-0" aria-hidden />Analisar publicação
-          </Button>
+        <Link
+          to="/app/assistentes/publicacoes"
+          className={buttonStyles('gold', 'sm', false, 'h-9 px-3.5 gap-2 transition-opacity duration-[180ms] hover:opacity-95 focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2')}
+        >
+          <Brain className="h-4 w-4 shrink-0" aria-hidden />Analisar publicação
         </Link>
-        <Link to="/app/processos" className="inline-flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy/40 focus-visible:ring-offset-2 rounded-lg dark:focus-visible:ring-gold/50">
-          <Button variant="outline" size="sm" className="h-9 px-3.5 gap-2 border transition-colors duration-[180ms] hover:bg-navy/5 focus-visible:ring-2 focus-visible:ring-navy/30 focus-visible:ring-offset-2 dark:focus-visible:ring-gold/40">
-            <Plus className="h-4 w-4 shrink-0" aria-hidden />Novo processo
-          </Button>
+        <Link
+          to="/app/processos"
+          className={buttonStyles('outline', 'sm', false, 'h-9 px-3.5 gap-2 border transition-colors duration-[180ms] hover:bg-navy/5 focus-visible:ring-2 focus-visible:ring-navy/30 focus-visible:ring-offset-2 dark:focus-visible:ring-gold/40')}
+        >
+          <Plus className="h-4 w-4 shrink-0" aria-hidden />Novo processo
         </Link>
-        <Link to="/app/prazos" className="inline-flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy/40 focus-visible:ring-offset-2 rounded-lg dark:focus-visible:ring-gold/50">
-          <Button variant="outline" size="sm" className="h-9 px-3.5 gap-2 border transition-colors duration-[180ms] hover:bg-navy/5 focus-visible:ring-2 focus-visible:ring-navy/30 focus-visible:ring-offset-2 dark:focus-visible:ring-gold/40">
-            <Plus className="h-4 w-4 shrink-0" aria-hidden />Novo prazo
-          </Button>
+        <Link
+          to="/app/prazos"
+          className={buttonStyles('outline', 'sm', false, 'h-9 px-3.5 gap-2 border transition-colors duration-[180ms] hover:bg-navy/5 focus-visible:ring-2 focus-visible:ring-navy/30 focus-visible:ring-offset-2 dark:focus-visible:ring-gold/40')}
+        >
+          <Plus className="h-4 w-4 shrink-0" aria-hidden />Novo prazo
         </Link>
       </div>
 
@@ -181,8 +184,8 @@ export function DashboardPage() {
               <p className="text-sm text-slate-300">Cole uma intimação e identifique prazos e riscos.</p>
             </div>
           </div>
-          <Link to="/app/assistentes/publicacoes">
-            <Button variant="gold">Analisar agora <ArrowRight className="h-4 w-4" /></Button>
+          <Link to="/app/assistentes/publicacoes" className={buttonStyles('gold', 'md')}>
+            Analisar agora <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </div>

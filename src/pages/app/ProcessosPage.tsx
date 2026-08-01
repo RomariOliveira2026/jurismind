@@ -10,6 +10,7 @@ import { Modal } from '../../components/ui/Modal'
 import { Input, Textarea, Select } from '../../components/ui/Input'
 import { Badge } from '../../components/ui/Badge'
 import { LoadingState } from '../../components/common/LoadingState'
+import { ErrorState } from '../../components/common/ErrorState'
 import { EmptyState } from '../../components/ui/EmptyState'
 import { Briefcase } from 'lucide-react'
 import { CASE_STATUS_LABELS, CASE_PHASE_LABELS } from '../../lib/labels'
@@ -21,6 +22,7 @@ export function ProcessosPage() {
   const [cases, setCases] = useState<Case[]>([])
   const [clients, setClients] = useState<{ id: string; name: string }[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
@@ -29,13 +31,19 @@ export function ProcessosPage() {
 
   const load = async () => {
     setLoading(true)
-    const [cs, cl] = await Promise.all([
-      listCases(orgId, { search, status: statusFilter || undefined }),
-      listClients(orgId),
-    ])
-    setCases(cs)
-    setClients(cl.map((c) => ({ id: c.id, name: c.name })))
-    setLoading(false)
+    setError(null)
+    try {
+      const [cs, cl] = await Promise.all([
+        listCases(orgId, { search, status: statusFilter || undefined }),
+        listClients(orgId),
+      ])
+      setCases(cs)
+      setClients(cl.map((c) => ({ id: c.id, name: c.name })))
+    } catch {
+      setError('Não foi possível carregar os processos. Tente novamente.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => { load() }, [orgId, search, statusFilter])
@@ -54,6 +62,7 @@ export function ProcessosPage() {
   }
 
   if (loading) return <LoadingState />
+  if (error) return <ErrorState message={error} onRetry={load} />
 
   return (
     <div className="space-y-6">

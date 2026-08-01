@@ -8,15 +8,17 @@ import {
   ChevronDown,
   Clock,
   FileText,
+  Menu,
   Scale,
   Shield,
   Sparkles,
   Users,
+  X,
   Zap,
 } from 'lucide-react'
 import { useState } from 'react'
 import { Logo } from '../components/Logo'
-import { Button } from '../components/ui/Button'
+import { buttonStyles } from '../components/ui/Button'
 import { ScrollToTop } from '../components/ui/ScrollToTop'
 import { faqItems, planos } from '../data/mockData'
 import { useTheme } from '../context/ThemeContext'
@@ -25,6 +27,13 @@ import { Moon, Sun } from 'lucide-react'
 export function LandingPage() {
   const { theme, toggleTheme } = useTheme()
   const [openFaq, setOpenFaq] = useState<number | null>(null)
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
+
+  const navLinks = [
+    { href: '#funcionalidades', label: 'Funcionalidades' },
+    { href: '#planos', label: 'Planos' },
+    { href: '#faq', label: 'FAQ' },
+  ]
 
   return (
     <div className="min-h-screen bg-ice dark:bg-navy">
@@ -33,35 +42,59 @@ export function LandingPage() {
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 lg:px-8">
           <Logo size="xl" onDark />
           <div className="hidden items-center gap-8 md:flex">
-            <a href="#funcionalidades" className="text-sm text-slate-300 hover:text-gold">
-              Funcionalidades
-            </a>
-            <a href="#planos" className="text-sm text-slate-300 hover:text-gold">
-              Planos
-            </a>
-            <a href="#faq" className="text-sm text-slate-300 hover:text-gold">
-              FAQ
-            </a>
+            {navLinks.map((link) => (
+              <a key={link.href} href={link.href} className="text-sm text-slate-300 hover:text-gold">
+                {link.label}
+              </a>
+            ))}
           </div>
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setMobileNavOpen((open) => !open)}
+              aria-label={mobileNavOpen ? 'Fechar menu' : 'Abrir menu'}
+              aria-expanded={mobileNavOpen}
+              className="rounded-lg p-2 text-ice hover:bg-navy-light cursor-pointer md:hidden"
+            >
+              {mobileNavOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
             <button
               onClick={toggleTheme}
               className="rounded-lg p-2 text-ice hover:bg-navy-light cursor-pointer"
             >
               {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </button>
-            <Link to="/login" className="hidden sm:block">
-              <Button variant="ghost" size="sm" className="text-slate-200 hover:bg-navy-light hover:text-white">
-                Entrar
-              </Button>
+            <Link to="/login" className={buttonStyles('ghost', 'sm', false, 'hidden sm:inline-flex text-slate-200 hover:bg-navy-light hover:text-white')}>
+              Entrar
             </Link>
-            <Link to="/cadastro">
-              <Button variant="gold" size="sm">
-                Começar grátis
-              </Button>
+            <Link to="/cadastro" className={buttonStyles('gold', 'sm')}>
+              Começar grátis
             </Link>
           </div>
         </div>
+        {mobileNavOpen && (
+          <div className="border-t border-slate-700/80 bg-navy px-4 py-4 md:hidden">
+            <div className="flex flex-col gap-3">
+              {navLinks.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMobileNavOpen(false)}
+                  className="text-sm text-slate-300 hover:text-gold"
+                >
+                  {link.label}
+                </a>
+              ))}
+              <Link
+                to="/login"
+                onClick={() => setMobileNavOpen(false)}
+                className="text-sm text-slate-300 hover:text-gold"
+              >
+                Entrar
+              </Link>
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* Hero */}
@@ -85,16 +118,12 @@ export function LandingPage() {
               mais importantes com inteligência artificial.
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Link to="/cadastro">
-                <Button variant="gold" size="lg">
-                  Começar agora
-                  <ArrowRight className="h-5 w-5" />
-                </Button>
+              <Link to="/cadastro" className={buttonStyles('gold', 'lg')}>
+                Começar agora
+                <ArrowRight className="h-5 w-5" />
               </Link>
-              <Link to="/login">
-                <Button variant="outline" size="lg" className="border-white/30 text-white hover:bg-white hover:text-navy">
-                  Ver demonstração
-                </Button>
+              <Link to="/login?demo=1" className={buttonStyles('outline', 'lg', false, 'border-white/30 text-white hover:bg-white hover:text-navy')}>
+                Ver demonstração
               </Link>
             </div>
           </div>
@@ -271,7 +300,7 @@ export function LandingPage() {
       </section>
 
       {/* Pricing */}
-      <section id="planos" className="py-20 lg:py-28">
+      <section id="planos" className="overflow-x-clip py-20 lg:py-28">
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <div className="text-center">
             <h2 className="text-3xl font-bold text-navy dark:text-ice lg:text-4xl">Planos</h2>
@@ -279,13 +308,13 @@ export function LandingPage() {
               Escolha o plano ideal para o seu momento profissional.
             </p>
           </div>
-          <div className="mt-12 grid gap-8 lg:grid-cols-3">
+          <div className="mt-12 grid gap-8 px-2 py-4 lg:grid-cols-3">
             {planos.map((plano) => (
               <div
                 key={plano.nome}
                 className={`relative rounded-xl border p-8 ${
                   plano.destaque
-                    ? 'border-gold bg-white shadow-xl dark:bg-navy-light scale-105'
+                    ? 'border-gold bg-white shadow-xl dark:bg-navy-light lg:scale-[1.02]'
                     : 'border-slate-200 bg-white dark:border-slate-700 dark:bg-navy-light'
                 }`}
               >
@@ -308,13 +337,11 @@ export function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link to="/cadastro" className="mt-8 block">
-                  <Button
-                    variant={plano.destaque ? 'gold' : 'outline'}
-                    fullWidth
-                  >
-                    {plano.nome === 'Gratuito' ? 'Começar grátis' : 'Assinar agora'}
-                  </Button>
+                <Link
+                  to="/cadastro"
+                  className={buttonStyles(plano.destaque ? 'gold' : 'outline', 'md', true, 'mt-8')}
+                >
+                  {plano.nome === 'Gratuito' ? 'Começar grátis' : 'Assinar agora'}
                 </Link>
               </div>
             ))}
@@ -390,11 +417,9 @@ export function LandingPage() {
             <p className="mt-4 text-slate-300">
               Organize sua prática jurídica com mais clareza, controle e apoio de inteligência artificial.
             </p>
-            <Link to="/cadastro" className="mt-8 inline-block">
-              <Button variant="gold" size="lg">
-                Criar conta gratuita
-                <ArrowRight className="h-5 w-5" />
-              </Button>
+            <Link to="/cadastro" className={buttonStyles('gold', 'lg', false, 'mt-8 inline-flex')}>
+              Criar conta gratuita
+              <ArrowRight className="h-5 w-5" />
             </Link>
           </div>
         </div>

@@ -4,14 +4,14 @@ import { Brain, Shield } from 'lucide-react'
 import type { AssistantDefinition } from '../../ai/assistants/registry'
 import { Card } from '../ui/Card'
 import { Badge } from '../ui/Badge'
-import { Button } from '../ui/Button'
+import { Button, buttonStyles } from '../ui/Button'
 import { cn } from '../../lib/utils'
 
 const RISK_VARIANT = { baixo: 'proximo', medio: 'futuro', alto: 'urgente' } as const
 const STATUS_LABEL = { ativo: 'Ativo', preparado: 'Preparado', em_breve: 'Em breve' }
 
 function AssistantCardInner({ assistant }: { assistant: AssistantDefinition }) {
-  const disabled = assistant.status === 'em_breve'
+  const disabled = assistant.status === 'em_breve' || assistant.status === 'preparado'
   return (
     <Card className={cn('flex flex-col h-full', disabled && 'opacity-60')}>
       <div className="flex items-start justify-between gap-2">
@@ -32,10 +32,12 @@ function AssistantCardInner({ assistant }: { assistant: AssistantDefinition }) {
         <p>v{assistant.version} · {STATUS_LABEL[assistant.status]}</p>
       </div>
       {disabled ? (
-        <Button variant="outline" size="sm" className="mt-4" disabled>Em breve</Button>
+        <Button variant="outline" size="sm" className="mt-4" disabled>
+          {assistant.status === 'em_breve' ? 'Em breve' : 'Em preparação'}
+        </Button>
       ) : (
-        <Link to={assistant.route} className="mt-4">
-          <Button variant="gold" size="sm" fullWidth>Abrir assistente</Button>
+        <Link to={assistant.route} className={buttonStyles('gold', 'sm', true, 'mt-4')}>
+          Abrir assistente
         </Link>
       )}
     </Card>

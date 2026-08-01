@@ -11,6 +11,7 @@ import { Input, Textarea, Select } from '../../components/ui/Input'
 import { Badge } from '../../components/ui/Badge'
 import { EmptyState } from '../../components/ui/EmptyState'
 import { LoadingState } from '../../components/common/LoadingState'
+import { ErrorState } from '../../components/common/ErrorState'
 import { ConfirmDialog } from '../../components/common/ConfirmDialog'
 import { CLIENT_STATUS_LABELS } from '../../lib/labels'
 
@@ -22,6 +23,7 @@ export function ClientesPage() {
 
   const [clients, setClients] = useState<(Client & { caseCount?: number })[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
@@ -30,10 +32,16 @@ export function ClientesPage() {
 
   const load = async () => {
     setLoading(true)
-    const items = await listClients(orgId, { search, status: statusFilter || undefined })
-    const withCounts = await Promise.all(items.map(async (c) => ({ ...c, caseCount: await countClientCases(c.id) })))
-    setClients(withCounts)
-    setLoading(false)
+    setError(null)
+    try {
+      const items = await listClients(orgId, { search, status: statusFilter || undefined })
+      const withCounts = await Promise.all(items.map(async (c) => ({ ...c, caseCount: await countClientCases(c.id) })))
+      setClients(withCounts)
+    } catch {
+      setError('Não foi possível carregar os clientes. Tente novamente.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => { load() }, [orgId, search, statusFilter])
@@ -54,6 +62,7 @@ export function ClientesPage() {
   }
 
   if (loading) return <LoadingState />
+  if (error) return <ErrorState message={error} onRetry={load} />
 
   return (
     <div className="space-y-6">

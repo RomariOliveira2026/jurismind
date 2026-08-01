@@ -9,6 +9,7 @@ import { Card, CardHeader, CardTitle } from '../../components/ui/Card'
 import { Textarea, Input } from '../../components/ui/Input'
 import { Badge } from '../../components/ui/Badge'
 import { LoadingState } from '../../components/common/LoadingState'
+import { ErrorState } from '../../components/common/ErrorState'
 import { AIDisclaimer } from '../../components/common/AIDisclaimer'
 import { PUBLICATION_STATUS_LABELS } from '../../lib/labels'
 import { AI_DISCLAIMER } from '../../lib/helpers'
@@ -20,6 +21,7 @@ export function PublicacoesPage() {
   const [selected, setSelected] = useState<Publication | null>(null)
   const [analysis, setAnalysis] = useState<PublicationAnalysis | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [analyzing, setAnalyzing] = useState(false)
   const [texto, setTexto] = useState('')
   const [source, setSource] = useState('DJE')
@@ -28,8 +30,14 @@ export function PublicacoesPage() {
 
   const load = async () => {
     setLoading(true)
-    setPublications(await listPublications(orgId))
-    setLoading(false)
+    setError(null)
+    try {
+      setPublications(await listPublications(orgId))
+    } catch {
+      setError('Não foi possível carregar as publicações. Tente novamente.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => { load() }, [orgId])
@@ -78,6 +86,7 @@ export function PublicacoesPage() {
   }
 
   if (loading) return <LoadingState />
+  if (error) return <ErrorState message={error} onRetry={load} />
 
   return (
     <div className="space-y-6">

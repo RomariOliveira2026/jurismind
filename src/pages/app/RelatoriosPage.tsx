@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { listDeadlines } from '../../services/deadlineService'
 import { listCases } from '../../services/caseService'
@@ -6,6 +6,7 @@ import { listTasks } from '../../services/taskService'
 import { listPublications } from '../../services/publicationService'
 import { Card, CardHeader, CardTitle } from '../../components/ui/Card'
 import { LoadingState } from '../../components/common/LoadingState'
+import { ErrorState } from '../../components/common/ErrorState'
 import { DEADLINE_STATUS_LABELS, CASE_PHASE_LABELS } from '../../lib/labels'
 import { env } from '../../config/env'
 
@@ -13,6 +14,7 @@ export function RelatoriosPage() {
   const { session } = useAuth()
   const orgId = session!.organization.id
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [data, setData] = useState({
     prazosPorStatus: [] as { label: string; value: number; color: string }[],
     processosPorFase: [] as { label: string; value: number }[],
@@ -20,8 +22,10 @@ export function RelatoriosPage() {
     publicacoesAnalisadas: 0,
   })
 
-  useEffect(() => {
-    const load = async () => {
+  const load = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
       const [deadlines, cases, tasks, pubs] = await Promise.all([
         listDeadlines(orgId),
         listCases(orgId),
@@ -43,12 +47,17 @@ export function RelatoriosPage() {
         tarefasConcluidas: tasks.filter((t) => t.status === 'concluida').length,
         publicacoesAnalisadas: pubs.filter((p) => p.status === 'analisada' || p.status === 'revisada').length,
       })
+    } catch {
+      setError('Não foi possível carregar os relatórios. Tente novamente.')
+    } finally {
       setLoading(false)
     }
-    load()
   }, [orgId])
 
+  useEffect(() => { load() }, [load])
+
   if (loading) return <LoadingState />
+  if (error) return <ErrorState message={error} onRetry={load} />
 
   const maxPhase = Math.max(...data.processosPorFase.map((d) => d.value), 1)
 
