@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-navy: #0b1f3a;
+  --color-navy-light: #132d4f;
+  --color-gold: #d4af37;
+  --color-gold-light: #e8c547;
+  --color-ice: #f8fafc;
+  --color-text: #334155;
+  --color-text-muted: #64748b;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-ice text-text antialiased;
+    font-family: var(--font-sans);
+  }
+
+  .dark body,
+  body.dark {
+    @apply bg-navy text-ice;
+  }
+}
+
+@layer utilities {
+  .gradient-navy {
+    background: linear-gradient(135deg, #0b1f3a 0%, #132d4f 50%, #1a3a5c 100%);
+  }
+
+  .gradient-gold {
+    background: linear-gradient(135deg, #d4af37 0%, #e8c547 100%);
+  }
+
+  .text-gradient-gold {
+    background: linear-gradient(135deg, #d4af37, #e8c547);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.45s ease-out forwards;
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes ai-pulse-soft {
+    0%, 100% {
+      opacity: 0.35;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.7;
+      transform: scale(1.4);
+    }
+  }
+
+  .ai-pulse-soft {
+    animation: ai-pulse-soft 2.5s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-fade-in {
+      animation: none;
+    }
+
+    .ai-pulse-soft {
+      animation: none;
+    }
+  }
+}
