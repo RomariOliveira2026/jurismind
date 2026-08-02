@@ -23,6 +23,7 @@ import { ScrollToTop } from '../components/ui/ScrollToTop'
 import { faqItems, planos } from '../data/mockData'
 import { useTheme } from '../context/ThemeContext'
 import { Moon, Sun } from 'lucide-react'
+import { SECURITY_CARD_ICONS } from '../components/icons/SecurityIcons'
 
 export function LandingPage() {
   const { theme, toggleTheme } = useTheme()
@@ -362,13 +363,17 @@ export function LandingPage() {
               { title: 'Criptografia', desc: 'Dados protegidos em trânsito com HTTPS/TLS.' },
               { title: 'LGPD', desc: 'Conformidade com a legislação brasileira de privacidade.' },
               { title: 'IA responsável', desc: 'Análises são sugestões — sempre revise antes de utilizar.' },
-            ].map(({ title, desc }) => (
+            ].map(({ title, desc }) => {
+              const Icon = SECURITY_CARD_ICONS[title as keyof typeof SECURITY_CARD_ICONS]
+              return (
               <div key={title} className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-navy-light">
-                <Shield className="h-6 w-6 text-gold mb-3" />
+                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-gold/10 border border-gold/20">
+                  <Icon className="h-6 w-6 text-gold" />
+                </div>
                 <h3 className="font-semibold text-navy dark:text-ice">{title}</h3>
                 <p className="mt-2 text-sm text-text-muted">{desc}</p>
               </div>
-            ))}
+            )})}
           </div>
         </div>
       </section>
