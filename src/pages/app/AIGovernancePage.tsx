@@ -6,6 +6,8 @@ import { LEGAL_ASSISTANTS } from '../../ai/assistants/registry'
 import { Badge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
 import { Input } from '../../components/ui/Input'
+import { FairUsePolicyLink } from '../../components/pricing/FairUsePolicyLink'
+import { FAIR_USE_POLICY_PATH } from '../../lib/aiFairUse'
 
 const TABS = ['visao', 'assistentes', 'permissoes', 'fontes', 'validacao', 'privacidade', 'historico', 'uso'] as const
 
@@ -86,7 +88,16 @@ export function AIGovernancePage() {
       {tab === 'uso' && (
         <Card>
           <CardHeader><div className="flex items-center gap-2"><BarChart3 className="h-5 w-5 text-gold" /><CardTitle>Uso e custos</CardTitle></div></CardHeader>
-          <p className="text-sm text-text-muted">Métricas disponíveis após conexão com Edge Function e provider configurado.</p>
+          <p className="text-sm text-text-muted">
+            Métricas administrativas por organização, usuário, provider, modelo, tokens e custo estimado — registradas em <code className="text-xs">ai_usage_logs</code> após conexão com a Edge Function.
+          </p>
+          <p className="text-sm text-text-muted mt-3">
+            Planos com IA ilimitada não exibem franquia mensal ao cliente. O consumo é monitorado internamente conforme a{' '}
+            <FairUsePolicyLink showSummaryOnClick={false}>Política de Uso Justo</FairUsePolicyLink>.
+          </p>
+          <Link to={FAIR_USE_POLICY_PATH} className="inline-block mt-4 text-sm text-gold hover:underline">
+            Ver política completa →
+          </Link>
         </Card>
       )}
 

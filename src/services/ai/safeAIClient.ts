@@ -12,6 +12,10 @@ import type {
   AIRequestStatus,
 } from '../../ai/safety/types'
 import { getAssistantBySlug } from '../../ai/assistants/registry'
+import {
+  recordAIUsage,
+  withUsageProtection,
+} from './usageTracker'
 
 const MAX_INPUT = 50000
 const DEMO_STORE_KEY = 'jurismind-ai-store'
@@ -140,63 +144,87 @@ export async function executeSafeAIRequest(ctx: AIRequestContext): Promise<AIRes
   const assistant = getAssistantBySlug(ctx.assistantSlug)
   if (!assistant) throw new Error('Assistente não encontrado')
 
-  const cleaned = stripDangerousHtml(sanitizeText(ctx.inputText, MAX_INPUT))
-  if (!cleaned.trim()) throw new Error('Informe um texto para análise.')
-  if (cleaned.length > MAX_INPUT) throw new Error('Texto excede o limite permitido.')
+  return withUsageProtection(
+    {
+      organizationId: ctx.organizationId,
+      userId: ctx.userId,
+      assistantSlug: ctx.assistantSlug,
+    },
+    async () => {
+      const cleaned = stripDangerousHtml(sanitizeText(ctx.inputText, MAX_INPUT))
+      if (!cleaned.trim()) throw new Error('Informe um texto para análise.')
+      if (cleaned.length > MAX_INPUT) throw new Error('Texto excede o limite permitido.')
 
-  const injection = checkPromptInjection(cleaned)
-  if (!injection.safe) {
-    throw new Error('Conteúdo bloqueado por segurança. Remova instruções suspeitas e tente novamente.')
-  }
+      const injection = checkPromptInjection(cleaned)
+      if (!injection.safe) {
+        throw new Error('Conteúdo bloqueado por segurança. Remova instruções suspeitas e tente novamente.')
+      }
 
-  const requestId = generateId()
-  let structured: SafeAIStructuredOutput
-  let provider = 'mock'
-  let model = 'demo'
+      const requestId = generateId()
+      const startedAt = Date.now()
+      let structured: SafeAIStructuredOutput
+      let provider = 'mock'
+      let model = 'demo'
 
-  if (env.demoMode) {
-    await new Promise((r) => setTimeout(r, 1200))
-    structured = buildMockPublicationOutput(cleaned, ctx)
-  } else {
-    try {
-      structured = await callEdgeFunction({ ...ctx, inputText: cleaned })
-      provider = 'edge-function'
-      model = 'configurable'
-    } catch {
-      structured = buildMockPublicationOutput(cleaned, ctx)
-      structured.warnings.push('Servidor de IA indisponível — exibindo análise assistida local.')
-    }
-  }
+      if (env.demoMode) {
+        await new Promise((r) => setTimeout(r, 1200))
+        structured = buildMockPublicationOutput(cleaned, ctx)
+      } else {
+        try {
+          structured = await callEdgeFunction({ ...ctx, inputText: cleaned })
+          provider = 'edge-function'
+          model = 'configurable'
+        } catch {
+          structured = buildMockPublicationOutput(cleaned, ctx)
+          structured.warnings.push('Servidor de IA indisponível — exibindo análise assistida local.')
+        }
+      }
 
-  const status: AIRequestStatus =
-    structured.confidenceScore < 40 ? 'low_confidence' : assistant.requiresValidation ? 'awaiting_review' : 'completed'
+      const status: AIRequestStatus =
+        structured.confidenceScore < 40 ? 'low_confidence' : assistant.requiresValidation ? 'awaiting_review' : 'completed'
 
-  const record: AIResponseRecord = {
-    id: generateId(),
-    requestId,
-    organizationId: ctx.organizationId,
-    provider,
-    model,
-    promptVersion: '1.0.0',
-    assistantId: assistant.id,
-    assistantVersion: assistant.version,
-    structuredOutput: structured,
-    responseText: structured.summary,
-    confidenceScore: structured.confidenceScore,
-    riskLevel: structured.riskLevel,
-    warnings: structured.warnings,
-    status,
-    createdAt: new Date().toISOString(),
-    demoMode: env.demoMode,
-  }
+      const record: AIResponseRecord = {
+        id: generateId(),
+        requestId,
+        organizationId: ctx.organizationId,
+        provider,
+        model,
+        promptVersion: '1.0.0',
+        assistantId: assistant.id,
+        assistantVersion: assistant.version,
+        structuredOutput: structured,
+        responseText: structured.summary,
+        confidenceScore: structured.confidenceScore,
+        riskLevel: structured.riskLevel,
+        warnings: structured.warnings,
+        status,
+        createdAt: new Date().toISOString(),
+        demoMode: env.demoMode,
+      }
 
-  if (env.demoMode) {
-    const store = getDemoStore()
-    store.responses.unshift(record)
-    persistDemoStore(store)
-  }
+      if (env.demoMode) {
+        const store = getDemoStore()
+        store.responses.unshift(record)
+        persistDemoStore(store)
+      }
 
-  return record
+      await recordAIUsage(
+        {
+          organizationId: ctx.organizationId,
+          userId: ctx.userId,
+          assistantId: assistant.id,
+          provider,
+          model,
+          durationMs: Date.now() - startedAt,
+          status: 'success',
+        },
+        cleaned,
+        structured.summary,
+      )
+
+      return record
+    },
+  )
 }
 
 export function saveValidation(

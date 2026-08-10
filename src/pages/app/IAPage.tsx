@@ -38,7 +38,13 @@ export function IAPage() {
     if (!texto.trim()) return
     setLoading(type)
     try {
-      const r = await analyzeLegalText({ text: texto, type })
+      const r = await analyzeLegalText(
+        { text: texto, type },
+        {
+          organizationId: session!.organization.id,
+          userId: session!.userId,
+        },
+      )
       setResult(r)
     } catch {
       toastError('Não foi possível concluir a análise. Tente novamente.')

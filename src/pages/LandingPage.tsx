@@ -16,7 +16,7 @@ import {
   X,
   Zap,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, Fragment } from 'react'
 import { Logo } from '../components/Logo'
 import { buttonStyles } from '../components/ui/Button'
 import { ScrollToTop } from '../components/ui/ScrollToTop'
@@ -24,6 +24,8 @@ import { faqItems, planos } from '../data/mockData'
 import { useTheme } from '../context/ThemeContext'
 import { Moon, Sun } from 'lucide-react'
 import { SECURITY_CARD_ICONS } from '../components/icons/SecurityIcons'
+import { FairUseFootnote, FairUsePolicyLink } from '../components/pricing/FairUsePolicyLink'
+import { PROFESSIONAL_AI_FEATURE_LABEL } from '../lib/aiFairUse'
 
 export function LandingPage() {
   const { theme, toggleTheme } = useTheme()
@@ -334,10 +336,20 @@ export function LandingPage() {
                   {plano.features.map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm text-text dark:text-slate-300">
                       <Check className="h-4 w-4 shrink-0 text-gold" />
-                      {f}
+                      {f === PROFESSIONAL_AI_FEATURE_LABEL ? (
+                        <span>
+                          {PROFESSIONAL_AI_FEATURE_LABEL.replace('*', '')}
+                          <FairUsePolicyLink className="text-sm">*</FairUsePolicyLink>
+                        </span>
+                      ) : (
+                        f
+                      )}
                     </li>
                   ))}
                 </ul>
+                {plano.nome === 'Profissional' && (
+                  <FairUseFootnote className="mt-4" />
+                )}
                 <Link
                   to="/cadastro"
                   className={buttonStyles(plano.destaque ? 'gold' : 'outline', 'md', true, 'mt-8')}
@@ -403,7 +415,7 @@ export function LandingPage() {
                 </button>
                 {openFaq === i && (
                   <div className="border-t border-slate-200 px-6 py-4 dark:border-slate-700">
-                    <p className="text-sm text-text-muted dark:text-slate-400">{item.resposta}</p>
+                    <FaqAnswer text={item.resposta} />
                   </div>
                 )}
               </div>
@@ -460,6 +472,7 @@ export function LandingPage() {
               <h4 className="font-semibold text-ice">Legal</h4>
               <ul className="mt-4 space-y-2 text-sm text-slate-400">
                 <li><Link to="/termos" className="hover:text-gold">Termos de uso</Link></li>
+                <li><Link to="/termos#politica-uso-justo-ia" className="hover:text-gold">Política de Uso Justo (IA)</Link></li>
                 <li><Link to="/privacidade" className="hover:text-gold">Privacidade</Link></li>
                 <li><Link to="/seguranca" className="hover:text-gold">Segurança</Link></li>
                 <li><Link to="/contato" className="hover:text-gold">Contato</Link></li>
@@ -474,6 +487,27 @@ export function LandingPage() {
 
       <ScrollToTop />
     </div>
+  )
+}
+
+function FaqAnswer({ text }: { text: string }) {
+  const marker = 'Política de Uso Justo'
+  if (!text.includes(marker)) {
+    return <p className="text-sm text-text-muted dark:text-slate-400">{text}</p>
+  }
+
+  const parts = text.split(marker)
+  return (
+    <p className="text-sm text-text-muted dark:text-slate-400">
+      {parts.map((part, index) => (
+        <Fragment key={index}>
+          {part}
+          {index < parts.length - 1 && (
+            <FairUsePolicyLink className="text-sm">{marker}</FairUsePolicyLink>
+          )}
+        </Fragment>
+      ))}
+    </p>
   )
 }
 

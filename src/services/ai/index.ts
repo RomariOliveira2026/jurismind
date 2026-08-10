@@ -1,8 +1,14 @@
 import type { PublicationAnalysis } from '../../types/entities'
 import { AI_DISCLAIMER, generateId, sanitizeText } from '../../lib/helpers'
 import type { AILegalInput, AILegalResult, AIProvider } from './types'
+import { recordAIUsage, withUsageProtection } from './usageTracker'
 
 export type { AILegalInput, AILegalResult, AIProvider } from './types'
+
+export interface AnalyzeLegalOptions {
+  organizationId?: string
+  userId?: string
+}
 
 export function toPublicationAnalysis(result: AILegalResult, publicationId: string): PublicationAnalysis {
   return {
@@ -93,20 +99,63 @@ export function setAIProvider(p: AIProvider) {
   provider = p
 }
 
-export async function analyzeLegalText(input: AILegalInput): Promise<AILegalResult> {
+export async function analyzeLegalText(
+  input: AILegalInput,
+  options?: AnalyzeLegalOptions,
+): Promise<AILegalResult> {
   if (!input.text.trim()) throw new Error('Informe um texto para análise.')
-  switch (input.type) {
-    case 'publicacao':
-      return provider.analyzePublication(input.text)
-    case 'resumo':
-      return provider.summarize(input.text)
-    case 'providencia':
-      return provider.suggestActions(input.text)
-    case 'rascunho':
-      return provider.draftDocument(input.text, input.caseNumber)
-    default:
-      throw new Error('Tipo de análise inválido.')
+
+  const run = async () => {
+    const startedAt = Date.now()
+    let result: AILegalResult
+
+    switch (input.type) {
+      case 'publicacao':
+        result = await provider.analyzePublication(input.text)
+        break
+      case 'resumo':
+        result = await provider.summarize(input.text)
+        break
+      case 'providencia':
+        result = await provider.suggestActions(input.text)
+        break
+      case 'rascunho':
+        result = await provider.draftDocument(input.text, input.caseNumber)
+        break
+      default:
+        throw new Error('Tipo de análise inválido.')
+    }
+
+    if (options?.organizationId && options?.userId) {
+      await recordAIUsage(
+        {
+          organizationId: options.organizationId,
+          userId: options.userId,
+          provider: 'mock',
+          model: 'demo',
+          durationMs: Date.now() - startedAt,
+          status: 'success',
+        },
+        input.text,
+        result.content,
+      )
+    }
+
+    return result
   }
+
+  if (options?.organizationId && options?.userId) {
+    return withUsageProtection(
+      {
+        organizationId: options.organizationId,
+        userId: options.userId,
+        assistantSlug: input.type,
+      },
+      run,
+    )
+  }
+
+  return run()
 }
 
 export { provider as getAIProvider }

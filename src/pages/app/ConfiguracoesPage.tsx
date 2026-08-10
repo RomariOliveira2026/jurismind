@@ -11,6 +11,7 @@ import { Card, CardHeader, CardTitle } from '../../components/ui/Card'
 import { Input, Select } from '../../components/ui/Input'
 import { Badge } from '../../components/ui/Badge'
 import { ROLE_LABELS } from '../../lib/permissions'
+import { FairUseFootnote } from '../../components/pricing/FairUsePolicyLink'
 
 const TABS = ['perfil', 'escritorio', 'equipe', 'alertas', 'seguranca', 'aparencia', 'plano'] as const
 
@@ -178,7 +179,13 @@ export function ConfiguracoesPage() {
             {['Gratuito', 'Profissional', 'Escritório'].map((p) => (
               <div key={p} className="rounded-lg border border-slate-200 p-4 text-center dark:border-slate-700">
                 <p className="font-semibold">{p}</p>
+                {p === 'Profissional' && (
+                  <p className="text-xs text-text-muted mt-2">IA ilimitada* para uso profissional normal</p>
+                )}
                 <Button variant="outline" size="sm" className="mt-2" disabled>Em breve</Button>
+                {p === 'Profissional' && (
+                  <FairUseFootnote className="mt-3 text-left" />
+                )}
               </div>
             ))}
           </div>

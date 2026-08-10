@@ -1,3 +1,5 @@
+import { PROFESSIONAL_AI_FEATURE_LABEL } from '../lib/aiFairUse'
+
 // Dados estáticos para a landing page (não conectados ao backend)
 
 export const faqItems = [
@@ -10,6 +12,16 @@ export const faqItems = [
     pergunta: 'Como a IA analisa publicações?',
     resposta:
       'Você cola o texto da publicação e nossa IA identifica prazos, riscos e sugere providências com base em padrões jurídicos. Nesta versão demo, os resultados são simulados.',
+  },
+  {
+    pergunta: 'O que significa IA ilimitada?',
+    resposta:
+      'Nos planos com IA ilimitada, você pode utilizar os recursos de inteligência artificial normalmente durante sua rotina profissional, sem uma franquia mensal visível de análises. O benefício está sujeito à nossa Política de Uso Justo, criada para evitar usos automatizados, abusivos ou que prejudiquem a disponibilidade do serviço para outros usuários.',
+  },
+  {
+    pergunta: 'Existe limite para utilizar a IA?',
+    resposta:
+      'Para o uso profissional normal, não trabalhamos com uma quantidade fixa de análises exibida ao usuário nos planos com IA ilimitada. O JurisMind monitora o consumo para manter segurança, estabilidade e disponibilidade. Em situações de uso excepcional ou automatizado, medidas de proteção podem ser aplicadas conforme a Política de Uso Justo.',
   },
   {
     pergunta: 'Meus dados estão seguros?',
@@ -52,7 +64,7 @@ export const planos = [
       'Processos ilimitados',
       'Clientes ilimitados',
       'Alertas por e-mail e WhatsApp',
-      'Análises IA ilimitadas',
+      PROFESSIONAL_AI_FEATURE_LABEL,
       'Relatórios avançados',
       'Agenda integrada',
     ],

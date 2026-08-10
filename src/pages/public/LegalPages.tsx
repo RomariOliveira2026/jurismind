@@ -1,5 +1,12 @@
 import { Link } from 'react-router-dom'
 import { Logo } from '../../components/Logo'
+import {
+  FAIR_USE_POLICY_ANCHOR,
+  FAIR_USE_POLICY_SECTIONS,
+  FAIR_USE_POLICY_TITLE,
+  FAIR_USE_SUMMARY,
+} from '../../lib/aiFairUse'
+import { FairUsePolicyLink } from '../../components/pricing/FairUsePolicyLink'
 
 function PublicLayout({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -43,6 +50,26 @@ export function TermsPage() {
       <p>O JurisMind é uma ferramenta de apoio à gestão jurídica. Não substitui o exercício profissional do advogado.</p>
       <h2 className="text-lg font-semibold text-navy dark:text-ice mt-6">Inteligência artificial</h2>
       <p>Análises geradas por IA são sugestões que devem ser revisadas por profissional habilitado antes de qualquer uso processual.</p>
+      <p>
+        Nos planos com IA ilimitada, o benefício refere-se ao uso profissional normal do produto, sem franquia mensal visível de análises, e está sujeito à{' '}
+        <FairUsePolicyLink showSummaryOnClick={false}>Política de Uso Justo</FairUsePolicyLink>.
+      </p>
+
+      <h2 id={FAIR_USE_POLICY_ANCHOR} className="text-lg font-semibold text-navy dark:text-ice mt-8 scroll-mt-24">
+        {FAIR_USE_POLICY_TITLE}
+      </h2>
+      <p>{FAIR_USE_SUMMARY}</p>
+      <ul className="list-disc pl-5 space-y-3 mt-4">
+        {FAIR_USE_POLICY_SECTIONS.map((section) => (
+          <li key={section.title}>
+            <strong>{section.title}:</strong> {section.body}
+          </li>
+        ))}
+      </ul>
+      <p className="mt-4 text-text-muted">
+        Esta política pode ser atualizada para refletir melhorias de segurança e operação da plataforma, sem alterar a natureza comercial do benefício de IA ilimitada para uso profissional normal.
+      </p>
+
       <h2 className="text-lg font-semibold text-navy dark:text-ice mt-6">Responsabilidade</h2>
       <p>O usuário é responsável pela veracidade dos dados inseridos e pela conferência de prazos e providências.</p>
     </PublicLayout>
