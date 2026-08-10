@@ -125,7 +125,15 @@ export function LandingPage() {
                 Começar agora
                 <ArrowRight className="h-5 w-5" />
               </Link>
-              <Link to="/login?demo=1" className={buttonStyles('outline', 'lg', false, 'border-white/30 text-white hover:bg-white hover:text-navy')}>
+              <Link
+                to="/login?demo=1"
+                className={buttonStyles(
+                  'outline',
+                  'lg',
+                  false,
+                  'border-white/30 !text-white hover:bg-white hover:!text-navy dark:border-white/30 dark:!text-white dark:hover:bg-white dark:hover:!text-navy',
+                )}
+              >
                 Ver demonstração
               </Link>
             </div>
